@@ -42,11 +42,12 @@ def cliente_endpoint(request):
 		print(e)		
 		return JsonResponse({'mensaje': 'Error - Datos enviados están mal parametrizados', 'code' : '01'})
 
-
+#Endpoint 2 | Todas las subcategorias
 def get_subcategoria(request):
 	queryset = Subcategoria.objects.all()
 	return JsonResponse({ 'response':[ob.as_json() for ob in queryset], 'code': '0'}, safe=False)
 
+#Endpoints Clientes Crear | Editar | Delete
 @api_view(['POST'])
 def subcategoria_endpoint(request):
 	try:		
@@ -76,11 +77,12 @@ def subcategoria_endpoint(request):
 		print(e)		
 		return JsonResponse({'mensaje': 'Error - Datos enviados están mal parametrizados', 'code' : '01'})
 
-
+#Endpoint 3 | Todas las categoria 
 def get_categoria(request):
 	queryset = Categoria.objects.all()
 	return JsonResponse({ 'response':[ob.as_json() for ob in queryset], 'code': '0'}, safe=False)
 
+#Endpoints Categorias Crear | Editar | Delete
 @api_view(['POST'])
 def categoria_endpoint(request):
 	try:		
@@ -126,10 +128,130 @@ def categoria_endpoint(request):
 	except Exception as e:
 		print(e)		
 		return JsonResponse({'mensaje': 'Error - Datos enviados están mal parametrizados', 'code' : '01'})
-	
-	
-		#return JsonResponse({'mensaje': 'AHH', 'code': 're'})		
-	#	serializer.create(cliente.as_json())	
-	#	return JsonResponse({'mensaje': 'Exito', 'code': '0'})
-	#else:
-	#	return JsonResponse({'mensaje': 'Error - No se pudo crear el registro', 'code': '1'})
+
+
+#Endpoint 4 | Todos los productos 
+def get_producto(request):
+	queryset = Producto.objects.all()
+	return JsonResponse({ 'response':[ob.as_json() for ob in queryset], 'code': '0'}, safe=False)
+
+#Endpoints Categorias Crear | Editar | Delete
+@api_view(['POST'])
+def producto_endpoint(request):
+	try:		
+		if request.data['task'] == "add":	
+			array = []
+			request.data['subcategorias']
+			queryset = Subcategoria.objects.filter(id__in=request.data['subcategorias'])
+			for sub in queryset:				
+				array.append(sub)
+			producto = Producto(nombre=request.data['nombre'], precio=request.data['precio'], foto=request.data['foto'])
+			producto.save()
+			for subcat in array:
+				producto.subcategoria.add(subcat)
+			return JsonResponse({'mensaje': 'Creado satisfactoriamente', 'code': '00'})
+		elif request.data['task'] == 'edit':
+			array = []
+			request.data['subcategorias']
+			queryset = Subcategoria.objects.filter(id__in=request.data['subcategorias'])
+			for sub in queryset:				
+				array.append(sub)
+			id_Producto = request.data['id']
+			queryset = Producto.objects.filter(id=id_Producto)
+			if queryset.count() > 0:
+				producto = queryset.update(nombre=request.data['nombre'], precio=request.data['precio'], foto=request.data['foto'])
+				queryset[0].subcategoria.clear()
+				for subcat in array:
+					queryset[0].subcategoria.add(subcat)
+				return JsonResponse({'mensaje': 'Editado satisfactoriamente', 'code': '00'})
+			else:
+				return JsonResponse({'mensaje': 'No existe esa producto en la base de datos', 'code' : '03'})
+			
+		elif request.data['task'] == 'delete':
+			id_Producto = request.data['id']			
+			queryset = Producto.objects.filter(id=id_Producto)
+			if queryset.count() > 0:
+				queryset.delete()
+				return JsonResponse({'mensaje': 'Eliminado satisfactoriamente', 'code': '00'})
+			else:
+				return JsonResponse({'mensaje': 'No existe esa producto en la base de datos', 'code' : '03'})
+			
+		else:
+			return JsonResponse({'mensaje': 'Error - parámetro task sin especificar', 'code' : '02'})
+	except Exception as e:
+		print(e)		
+		return JsonResponse({'mensaje': 'Error - Datos enviados están mal parametrizados', 'code' : '01'})
+
+
+#Endpoint 5 | Todas las tiendas 
+def get_tienda(request):
+	queryset = Tienda.objects.all()
+	return JsonResponse({ 'response':[ob.as_json() for ob in queryset], 'code': '0'}, safe=False)
+
+#Endpoints Categorias Crear | Editar | Delete
+@api_view(['POST'])
+def tienda_endpoint(request):
+	try:		
+		if request.data['task'] == "add":	
+			array_clientes = []
+			request.data['clientes']
+			queryset = Cliente.objects.filter(id__in=request.data['clientes'])
+			for sub in queryset:				
+				array_clientes.append(sub)
+
+			array_categorias = []
+			queryset = Categoria.objects.filter(id__in=request.data['categorias'])
+			for sub in queryset:
+				array_categorias.append(sub)
+
+			tienda = Tienda(nombre=request.data['nombre'], ubicacion=request.data['ubicacion'])
+			tienda.save()
+			for cliente in array_clientes:
+				tienda.clientes.add(cliente)
+
+			for cate in array_categorias:
+				tienda.categorias.add(cate)
+
+			return JsonResponse({'mensaje': 'Creado satisfactoriamente', 'code': '00'})
+		elif request.data['task'] == 'edit':
+			array_clientes = []
+			request.data['clientes']
+			queryset = Cliente.objects.filter(id__in=request.data['clientes'])
+			for sub in queryset:				
+				array_clientes.append(sub)
+
+			array_categorias = []
+			queryset = Categoria.objects.filter(id__in=request.data['categorias'])
+			for sub in queryset:
+				array_categorias.append(sub)
+
+			id_Tienda = request.data['id']
+			queryset = Tienda.objects.filter(id=id_Tienda)
+			if queryset.count() > 0:
+				tienda = queryset.update(nombre=request.data['nombre'], ubicacion=request.data['ubicacion'])
+				queryset[0].clientes.clear()
+				queryset[0].categorias.clear()
+				for cliente in array_clientes:
+					queryset[0].clientes.add(cliente)
+
+				for categoria in array_categorias:
+					queryset[0].categorias.add(categoria)
+
+				return JsonResponse({'mensaje': 'Editado satisfactoriamente', 'code': '00'})
+			else:
+				return JsonResponse({'mensaje': 'No existe esa tienda en la base de datos', 'code' : '03'})
+			
+		elif request.data['task'] == 'delete':
+			id_Tienda = request.data['id']			
+			queryset = Tienda.objects.filter(id=id_Tienda)
+			if queryset.count() > 0:
+				queryset.delete()
+				return JsonResponse({'mensaje': 'Eliminado satisfactoriamente', 'code': '00'})
+			else:
+				return JsonResponse({'mensaje': 'No existe esa tienda en la base de datos', 'code' : '03'})
+			
+		else:
+			return JsonResponse({'mensaje': 'Error - parámetro task sin especificar', 'code' : '02'})
+	except Exception as e:
+		print(e)		
+		return JsonResponse({'mensaje': 'Error - Datos enviados están mal parametrizados', 'code' : '01'})

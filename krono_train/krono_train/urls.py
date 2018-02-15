@@ -34,9 +34,18 @@ urlpatterns = [
 
     #Endpoint | Mostrar categorias
     url(r'^Zeus/categorias/', views.get_categoria),
-    #Endpoint | Cliente    
+    #Endpoint | Categoria    
     url(r'^Zeus/categorias_endpoint', views.categoria_endpoint),
 
+    #Endpoint | Mostrar Producto
+    url(r'^Zeus/productos/', views.get_producto),
+    #Endpoint | Producto    
+    url(r'^Zeus/productos_endpoint', views.producto_endpoint),
+
+    #Endpoint | Mostrar Tienda
+    url(r'^Zeus/tiendas/', views.get_tienda),
+    #Endpoint | Tienda    
+    url(r'^Zeus/tiendas_endpoint', views.tienda_endpoint),
     
    # url(r'^api_test/shops/(?P<userid>\d+)/$', views.get_tiendas_by_id),
     #Endpoint3

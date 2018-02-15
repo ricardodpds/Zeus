@@ -28,7 +28,7 @@ class Producto(models.Model):
 	foto = models.CharField(max_length=500)
 	subcategoria = models.ManyToManyField(Subcategoria)
 	def as_json(self):
-		return dict(id=self.id,nombre=self.nombre, precio=self.precio, foto=self.foto, subcategoria=self.subcategoria)
+		return dict(id=self.id,nombre=self.nombre, precio=self.precio, foto=self.foto, subcategoria=[ dict(id=subcategoria.id, nombre=subcategoria.nombre, activa=subcategoria.activa) for subcategoria in self.subcategoria.all()])
 
 class Tienda(models.Model):
 	nombre = models.CharField(max_length=100)
@@ -36,7 +36,7 @@ class Tienda(models.Model):
 	clientes = models.ManyToManyField(Cliente)
 	categorias = models.ManyToManyField(Categoria)		
 	def as_json(self):
-		return dict(id=self.id,nombre=self.nombre, ubicacion=self.ubicacion, clientes=self.clientes, categorias=self.categorias)
+		return dict(id=self.id,nombre=self.nombre, ubicacion=self.ubicacion, clientes=[ dict(id=clientes.id, nombre=clientes.nombre, apellido=clientes.apellido, email=clientes.email) for clientes in self.clientes.all()], categorias=[ dict(id=categorias.id, nombre=categorias.nombre, activa=categorias.activa) for categorias in self.categorias.all()])
 
 class Canasta(models.Model):
 	productos = models.ManyToManyField(Producto)
