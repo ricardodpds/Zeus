@@ -25,7 +25,7 @@ SECRET_KEY = 'z1r8llp1y-z$+pz!pc!&igeny2$o=u7y6f^k!qp*l+@+03nz*u'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [ 'localhost', '127.0.0.1', 'krono-train-dev.us-east-1.elasticbeanstalk.com']
 
 
 # Application definition
