@@ -40,12 +40,12 @@ class Tienda(models.Model):
 
 class Canasta(models.Model):
 	productos = models.ManyToManyField(Producto)
-	cliente = models.OneToOneField(Cliente)
-	tienda = models.OneToOneField(Tienda)
+	cliente = models.ForeignKey(Cliente)
+	tienda = models.ForeignKey(Tienda)
 	def as_json(self):
-		return dict(id=self.id,productos=self.productos, cliente=self.cliente, tienda=self.tienda)
+		return dict(id=self.id,productos=[ dict(id=productos.id, nombre=productos.nombre, precio=productos.precio, foto=productos.foto) for productos in self.productos.all()], cliente=dict(id=self.cliente.id, nombre= self.cliente.nombre, apellido=self.cliente.apellido, email=self.cliente.email), tienda=dict(id=self.tienda.id,nombre=self.tienda.nombre, ubicacion=self.tienda.ubicacion))
 
 class Orden(models.Model):
 	canasta = models.OneToOneField(Canasta)
 	def as_json(self):
-		return dict(id=self.id,canasta=self.canasta)
+		return dict(id=self.id,id_canasta=self.canasta.id )

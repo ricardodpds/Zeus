@@ -6,3 +6,5 @@ from .models import Cliente, Tienda, Subcategoria, Categoria, Producto, Canasta,
 admin.site.register(Cliente)
 admin.site.register(Subcategoria)
 admin.site.register(Categoria)
+admin.site.register(Canasta)
+admin.site.register(Orden)

@@ -12,6 +12,9 @@ def get_users(request):
 	queryset = Cliente.objects.all()
 	return JsonResponse({ 'response':[ob.as_json() for ob in queryset], 'code': '0'}, safe=False)
 
+def get_entity_user(request):
+	return JsonResponse({ 'Cliente': {'id': 'integer','nombre': 'string','apellido': 'string', 'email': 'string', }} )
+
 #Endpoints Clientes Crear | Editar | Delete
 @api_view(['POST'])
 def cliente_endpoint(request):
@@ -46,6 +49,9 @@ def cliente_endpoint(request):
 def get_subcategoria(request):
 	queryset = Subcategoria.objects.all()
 	return JsonResponse({ 'response':[ob.as_json() for ob in queryset], 'code': '0'}, safe=False)
+
+def get_entity_subcategoria(request):
+	return JsonResponse({ 'Subcategoria': {'id': 'integer','nombre': 'string','activa': 'boolean' }} )
 
 #Endpoints Clientes Crear | Editar | Delete
 @api_view(['POST'])
@@ -82,13 +88,15 @@ def get_categoria(request):
 	queryset = Categoria.objects.all()
 	return JsonResponse({ 'response':[ob.as_json() for ob in queryset], 'code': '0'}, safe=False)
 
+def get_entity_categoria(request):
+	return JsonResponse({ 'Categoria': {'id': 'integer','nombre': 'string','activa': 'boolean', 'subcategorias': 'Array de Subcategorias' }} )
+
 #Endpoints Categorias Crear | Editar | Delete
 @api_view(['POST'])
 def categoria_endpoint(request):
 	try:		
 		if request.data['task'] == "add":	
 			array = []
-			request.data['subcategorias']
 			queryset = Subcategoria.objects.filter(id__in=request.data['subcategorias'])
 			for sub in queryset:				
 				array.append(sub)
@@ -99,7 +107,6 @@ def categoria_endpoint(request):
 			return JsonResponse({'mensaje': 'Creado satisfactoriamente', 'code': '00'})
 		elif request.data['task'] == 'edit':
 			array = []
-			request.data['subcategorias']
 			queryset = Subcategoria.objects.filter(id__in=request.data['subcategorias'])
 			for sub in queryset:				
 				array.append(sub)
@@ -135,13 +142,15 @@ def get_producto(request):
 	queryset = Producto.objects.all()
 	return JsonResponse({ 'response':[ob.as_json() for ob in queryset], 'code': '0'}, safe=False)
 
+def get_entity_producto(request):
+	return JsonResponse({ 'Producto': {'id': 'integer','nombre': 'string','precio': 'double', 'foto': 'string','subcategorias': 'Array de Subcategorias' }} )
+
 #Endpoints Categorias Crear | Editar | Delete
 @api_view(['POST'])
 def producto_endpoint(request):
 	try:		
 		if request.data['task'] == "add":	
 			array = []
-			request.data['subcategorias']
 			queryset = Subcategoria.objects.filter(id__in=request.data['subcategorias'])
 			for sub in queryset:				
 				array.append(sub)
@@ -152,7 +161,6 @@ def producto_endpoint(request):
 			return JsonResponse({'mensaje': 'Creado satisfactoriamente', 'code': '00'})
 		elif request.data['task'] == 'edit':
 			array = []
-			request.data['subcategorias']
 			queryset = Subcategoria.objects.filter(id__in=request.data['subcategorias'])
 			for sub in queryset:				
 				array.append(sub)
@@ -188,13 +196,15 @@ def get_tienda(request):
 	queryset = Tienda.objects.all()
 	return JsonResponse({ 'response':[ob.as_json() for ob in queryset], 'code': '0'}, safe=False)
 
-#Endpoints Categorias Crear | Editar | Delete
+def get_entity_tienda(request):
+	return JsonResponse({ 'Tienda': {'id': 'integer','nombre': 'string', 'ubicacion': 'string','categorias': 'Array de Categorias', 'clientes': 'Array de Clientes' }} )
+
+#Endpoints Tienda Crear | Editar | Delete
 @api_view(['POST'])
 def tienda_endpoint(request):
 	try:		
 		if request.data['task'] == "add":	
 			array_clientes = []
-			request.data['clientes']
 			queryset = Cliente.objects.filter(id__in=request.data['clientes'])
 			for sub in queryset:				
 				array_clientes.append(sub)
@@ -215,7 +225,6 @@ def tienda_endpoint(request):
 			return JsonResponse({'mensaje': 'Creado satisfactoriamente', 'code': '00'})
 		elif request.data['task'] == 'edit':
 			array_clientes = []
-			request.data['clientes']
 			queryset = Cliente.objects.filter(id__in=request.data['clientes'])
 			for sub in queryset:				
 				array_clientes.append(sub)
@@ -249,6 +258,123 @@ def tienda_endpoint(request):
 				return JsonResponse({'mensaje': 'Eliminado satisfactoriamente', 'code': '00'})
 			else:
 				return JsonResponse({'mensaje': 'No existe esa tienda en la base de datos', 'code' : '03'})
+			
+		else:
+			return JsonResponse({'mensaje': 'Error - parámetro task sin especificar', 'code' : '02'})
+	except Exception as e:
+		print(e)		
+		return JsonResponse({'mensaje': 'Error - Datos enviados están mal parametrizados', 'code' : '01'})
+
+#Endpoint 6 | Todas las canastas 
+def get_canasta(request):
+	queryset = Canasta.objects.all()
+	return JsonResponse({ 'response':[ob.as_json() for ob in queryset], 'code': '0'}, safe=False)
+
+def get_entity_canasta(request):
+	return JsonResponse({ 'Canasta': {'id': 'integer', 'productos': 'Array de Productos', 'cliente': 'Cliente', 'tienda': 'Tienda' }} )
+
+#Endpoints Canasta Crear | Editar | Delete
+@api_view(['POST'])
+def canasta_endpoint(request):
+	try:		
+		if request.data['task'] == "add":	
+			array_productos = []
+			queryset = Producto.objects.filter(id__in=request.data['productos'])
+			for sub in queryset:				
+				array_productos.append(sub)
+			tienda = Tienda.objects.filter(id=request.data['tienda'])
+			cliente = Cliente.objects.filter(id=request.data['cliente'])
+
+			if tienda.count() > 0 and cliente.count() > 0:
+				canasta = Canasta(cliente=cliente[0], tienda= tienda[0])
+				canasta.save()
+				for producto in array_productos:
+					canasta.productos.add(producto)	
+				return JsonResponse({'mensaje': 'Creado satisfactoriamente', 'code': '00'})
+			else:
+				return JsonResponse({'mensaje': 'No existe esta tienda o cliente en la base de datos', 'code': '03'})
+			
+		elif request.data['task'] == 'edit':
+			array_productos = []
+			queryset = Producto.objects.filter(id__in=request.data['productos'])
+			for sub in queryset:				
+				array_productos.append(sub)
+			
+			id_Canasta = request.data['id']
+			queryset = Canasta.objects.filter(id=id_Canasta)
+			if queryset.count() > 0:
+				tienda = Tienda.objects.filter(id=request.data['tienda'])
+				cliente = Cliente.objects.filter(id=request.data['cliente'])
+
+				if tienda.count() > 0 and cliente.count() > 0:
+					canasta = queryset.update(cliente=cliente[0], tienda= tienda[0])
+					queryset[0].productos.clear()
+					for producto in array_productos:
+						queryset[0].productos.add(producto)
+					return JsonResponse({'mensaje': 'Editado satisfactoriamente', 'code': '00'})
+				else:
+					return JsonResponse({'mensaje': 'No existe esta tienda o cliente en la base de datos', 'code': '03'})
+			else:
+				return JsonResponse({'mensaje': 'No existe esa Canasta en la base de datos', 'code' : '03'})
+			
+		elif request.data['task'] == 'delete':
+			id_Canasta = request.data['id']			
+			queryset = Canasta.objects.filter(id=id_Canasta)
+			if queryset.count() > 0:
+				queryset.delete()
+				return JsonResponse({'mensaje': 'Eliminado satisfactoriamente', 'code': '00'})
+			else:
+				return JsonResponse({'mensaje': 'No existe esa Canasta en la base de datos', 'code' : '03'})
+			
+		else:
+			return JsonResponse({'mensaje': 'Error - parámetro task sin especificar', 'code' : '02'})
+	except Exception as e:
+		print(e)		
+		return JsonResponse({'mensaje': 'Error - Datos enviados están mal parametrizados', 'code' : '01'})
+
+#Endpoint 7 | Todas las ordenes 
+def get_orden(request):
+	queryset = Orden.objects.all()
+	return JsonResponse({ 'response':[ob.as_json() for ob in queryset], 'code': '0'}, safe=False)
+
+def get_entity_orden(request):
+	return JsonResponse({ 'Orden': {'id': 'integer', 'canasta': 'Canasta'}} )
+
+#Endpoints Ordenes Crear | Editar | Delete
+@api_view(['POST'])
+def orden_endpoint(request):
+	try:		
+		if request.data['task'] == "add":				
+			canasta = Canasta.objects.filter(id=request.data['canasta'])
+			if canasta.count() > 0:
+				orden = Orden(canasta=canasta[0])
+				orden.save()
+				return JsonResponse({'mensaje': 'Creado satisfactoriamente', 'code': '00'})
+			else:
+				return JsonResponse({'mensaje': 'No existe esa canasta en la base de datos', 'code': '03'})
+			
+		elif request.data['task'] == 'edit':
+			
+			id_Orden = request.data['id']
+			queryset = Orden.objects.filter(id=id_Orden)
+			if queryset.count() > 0:
+				canasta = Canasta.objects.filter(id=request.data['canasta'])
+				if canasta.count() > 0:
+					canasta = queryset.update(canasta=canasta[0])
+					return JsonResponse({'mensaje': 'Editado satisfactoriamente', 'code': '00'})
+				else:
+					return JsonResponse({'mensaje': 'No existe esta canasta en la base de datos', 'code': '03'})
+			else:
+				return JsonResponse({'mensaje': 'No existe esa Orden en la base de datos', 'code' : '03'})
+			
+		elif request.data['task'] == 'delete':
+			id_Orden = request.data['id']			
+			queryset = Orden.objects.filter(id=id_Orden)
+			if queryset.count() > 0:
+				queryset.delete()
+				return JsonResponse({'mensaje': 'Eliminado satisfactoriamente', 'code': '00'})
+			else:
+				return JsonResponse({'mensaje': 'No existe esa Orden en la base de datos', 'code' : '03'})
 			
 		else:
 			return JsonResponse({'mensaje': 'Error - parámetro task sin especificar', 'code' : '02'})
