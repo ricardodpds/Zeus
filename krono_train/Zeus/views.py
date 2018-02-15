@@ -60,7 +60,7 @@ def subcategoria_endpoint(request):
 				queryset.update(nombre=request.data['nombre'], activa=request.data['activa'])
 				return JsonResponse({'mensaje': 'Editado satisfactoriamente', 'code': '00'})
 			else:
-				return JsonResponse({'mensaje': 'No existe ese cliente en la base de datos', 'code' : '03'})
+				return JsonResponse({'mensaje': 'No existe esa subcategoria en la base de datos', 'code' : '03'})
 		elif request.data['task'] == 'delete':
 			id_subcategoria = request.data['id']			
 			queryset = Subcategoria.objects.filter(id=id_subcategoria)
@@ -68,7 +68,7 @@ def subcategoria_endpoint(request):
 				queryset.delete()
 				return JsonResponse({'mensaje': 'Eliminado satisfactoriamente', 'code': '00'})
 			else:
-				return JsonResponse({'mensaje': 'No existe ese cliente en la base de datos', 'code' : '03'})
+				return JsonResponse({'mensaje': 'No existe esa subcategoria en la base de datos', 'code' : '03'})
 			
 		else:
 			return JsonResponse({'mensaje': 'Error - parámetro task sin especificar', 'code' : '02'})
@@ -76,7 +76,57 @@ def subcategoria_endpoint(request):
 		print(e)		
 		return JsonResponse({'mensaje': 'Error - Datos enviados están mal parametrizados', 'code' : '01'})
 
-		
+
+def get_categoria(request):
+	queryset = Categoria.objects.all()
+	return JsonResponse({ 'response':[ob.as_json() for ob in queryset], 'code': '0'}, safe=False)
+
+@api_view(['POST'])
+def categoria_endpoint(request):
+	try:		
+		if request.data['task'] == "add":	
+			array = []
+			request.data['subcategorias']
+			queryset = Subcategoria.objects.filter(id__in=request.data['subcategorias'])
+			for sub in queryset:				
+				array.append(sub)
+			categoria = Categoria(nombre=request.data['nombre'], activa=request.data['activa'])
+			categoria.save()
+			for subcat in array:
+				categoria.subcategorias.add(subcat)
+			return JsonResponse({'mensaje': 'Creado satisfactoriamente', 'code': '00'})
+		elif request.data['task'] == 'edit':
+			array = []
+			request.data['subcategorias']
+			queryset = Subcategoria.objects.filter(id__in=request.data['subcategorias'])
+			for sub in queryset:				
+				array.append(sub)
+			id_Categoria = request.data['id']
+			queryset = Categoria.objects.filter(id=id_Categoria)
+			if queryset.count() > 0:
+				categoria = queryset.update(nombre=request.data['nombre'], activa=request.data['activa'])
+				queryset[0].subcategorias.clear()
+				for subcat in array:
+					queryset[0].subcategorias.add(subcat)
+				return JsonResponse({'mensaje': 'Editado satisfactoriamente', 'code': '00'})
+			else:
+				return JsonResponse({'mensaje': 'No existe esa categoria en la base de datos', 'code' : '03'})
+			
+		elif request.data['task'] == 'delete':
+			id_Categoria = request.data['id']			
+			queryset = Categoria.objects.filter(id=id_Categoria)
+			if queryset.count() > 0:
+				queryset.delete()
+				return JsonResponse({'mensaje': 'Eliminado satisfactoriamente', 'code': '00'})
+			else:
+				return JsonResponse({'mensaje': 'No existe esa categoria en la base de datos', 'code' : '03'})
+			
+		else:
+			return JsonResponse({'mensaje': 'Error - parámetro task sin especificar', 'code' : '02'})
+	except Exception as e:
+		print(e)		
+		return JsonResponse({'mensaje': 'Error - Datos enviados están mal parametrizados', 'code' : '01'})
+	
 	
 		#return JsonResponse({'mensaje': 'AHH', 'code': 're'})		
 	#	serializer.create(cliente.as_json())	

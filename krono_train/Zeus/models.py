@@ -18,15 +18,15 @@ class Subcategoria(models.Model):
 class Categoria(models.Model):
 	nombre = models.CharField(max_length=100)
 	activa = models.BooleanField()
-	subcategorias = models.ForeignKey(Subcategoria)
+	subcategorias = models.ManyToManyField(Subcategoria)
 	def as_json(self):
-		return dict(id=self.id,nombre=self.nombre, activa=self.activa, subcategorias=self.subcategorias)
+		return dict(id=self.id,nombre=self.nombre, activa=self.activa, subcategorias=[ dict(id=subcategorias.id, nombre=subcategorias.nombre, activa=subcategorias.activa) for subcategorias in self.subcategorias.all()])
 
 class Producto(models.Model):
 	nombre = models.CharField(max_length=100)
 	precio = models.FloatField(null=True)
 	foto = models.CharField(max_length=500)
-	subcategoria = models.ForeignKey(Subcategoria)
+	subcategoria = models.ManyToManyField(Subcategoria)
 	def as_json(self):
 		return dict(id=self.id,nombre=self.nombre, precio=self.precio, foto=self.foto, subcategoria=self.subcategoria)
 
@@ -34,12 +34,12 @@ class Tienda(models.Model):
 	nombre = models.CharField(max_length=100)
 	ubicacion = models.CharField(max_length=1000)	
 	clientes = models.ManyToManyField(Cliente)
-	categorias = models.ForeignKey(Categoria)		
+	categorias = models.ManyToManyField(Categoria)		
 	def as_json(self):
 		return dict(id=self.id,nombre=self.nombre, ubicacion=self.ubicacion, clientes=self.clientes, categorias=self.categorias)
 
 class Canasta(models.Model):
-	productos = models.ForeignKey(Producto)
+	productos = models.ManyToManyField(Producto)
 	cliente = models.OneToOneField(Cliente)
 	tienda = models.OneToOneField(Tienda)
 	def as_json(self):

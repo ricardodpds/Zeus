@@ -20,17 +20,22 @@ from Zeus import views
 
 
 urlpatterns = [
-    #path('admin/', admin.site.urls),
+    #Endpoint | Admin
     url(r'^admin/', admin.site.urls),
     #Endpoint | Mostrar clientes
     url(r'^Zeus/clientes/', views.get_users),
     #Endpoint | Cliente    
     url(r'^Zeus/clientes_endpoint', views.cliente_endpoint),
 
-     #Endpoint | Mostrar clientes
+     #Endpoint | Mostrar Subcategorias
     url(r'^Zeus/subcategorias/', views.get_subcategoria),
-    #Endpoint | Cliente    
+    #Endpoint | Subcategorias    
     url(r'^Zeus/subcategorias_endpoint', views.subcategoria_endpoint),
+
+    #Endpoint | Mostrar categorias
+    url(r'^Zeus/categorias/', views.get_categoria),
+    #Endpoint | Cliente    
+    url(r'^Zeus/categorias_endpoint', views.categoria_endpoint),
 
     
    # url(r'^api_test/shops/(?P<userid>\d+)/$', views.get_tiendas_by_id),
