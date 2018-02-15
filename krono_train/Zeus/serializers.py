@@ -10,34 +10,34 @@ from .models import Orden
 class ClienteSerializer(serializers.Serializer):
 	class Meta:
 		model = Cliente
-		fields = ('nombre', 'apellido', 'email')
+		fields = ('id','nombre', 'apellido', 'email')
 
 class TiendaSerializer(serializers.Serializer):
 	class Meta:
 		model = Tienda
-		fields = ('nombre', 'ubicacion', 'clientes', 'categorias')
+		fields = ('id','nombre', 'ubicacion', 'clientes', 'categorias')
 
 class SubcategoriaSerializer(serializers.Serializer):
 	class Meta:
 		model = Subcategoria
-		fields = ('nombre', 'activa')
+		fields = ('id','nombre', 'activa')
 
 class CategoriaSerializer(serializers.Serializer):
 	class Meta:
 		model = Categoria
-		fields = ('nombre', 'activa', 'subcategorias')
+		fields = ('id','nombre', 'activa', 'subcategorias')
 
 class ProductoSerializer(serializers.Serializer):
 	class Meta:
 		model = Producto
-		fields = ('nombre', 'precio', 'foto', 'subcategoria')
+		fields = ('id','nombre', 'precio', 'foto', 'subcategoria')
 
 class CanastaSerializer(serializers.Serializer):
 	class Meta:
 		model = Canasta
-		fields = ('productos', 'cliente', 'tienda')
+		fields = ('id','productos', 'cliente', 'tienda')
 
 class OrdenSerializer(serializers.Serializer):
 	class Meta:
 		model = Orden
-		fields = ('canasta')
+		fields = ('id','canasta')

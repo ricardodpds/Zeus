@@ -21,10 +21,18 @@ from Zeus import views
 
 urlpatterns = [
     #path('admin/', admin.site.urls),
-    #Endpoint1
     url(r'^admin/', admin.site.urls),
+    #Endpoint | Mostrar clientes
     url(r'^Zeus/clientes/', views.get_users),
-    #Endpoint2    
+    #Endpoint | Cliente    
+    url(r'^Zeus/clientes_endpoint', views.cliente_endpoint),
+
+     #Endpoint | Mostrar clientes
+    url(r'^Zeus/subcategorias/', views.get_subcategoria),
+    #Endpoint | Cliente    
+    url(r'^Zeus/subcategorias_endpoint', views.subcategoria_endpoint),
+
+    
    # url(r'^api_test/shops/(?P<userid>\d+)/$', views.get_tiendas_by_id),
     #Endpoint3
    # url(r'^api_test/shops_city/user=(?P<user>\d+)&city=(?P<city>\d+)/$', views.get_tiendas_by_city),
