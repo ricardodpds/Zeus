@@ -23,7 +23,7 @@ urlpatterns = [
     #Endpoint | Admin
     url(r'^admin/', admin.site.urls),
     #Endpoint | Mostrar clientes
-    url(r'^Zeus/clientes', views.get_users),
+    url(r'^Zeus/clientes/', views.get_users),
     #Endpoint | Cliente    
     url(r'^Zeus/clientes_endpoint', views.cliente_endpoint),
     #Endpoint | entity
